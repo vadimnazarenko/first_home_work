@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="module" version="1.5.0">
+	<name>Donation Module</name>
+	<author>Michael Fatica, Fatica Consulting L.L.C.</author>
+	<creationDate>July 2009</creationDate>
+	<copyright>Copyright (C) 2009 Fatica Consulting L.L.C. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>mike@fatica.net</authorEmail>
+	<authorUrl>www.fatica.net</authorUrl>
+	<version>1.5.0</version>
+	<description>Donations</description>
+	<files>
+		<filename module="mod_donate">mod_donate.php</filename>
+		<filename>index.html</filename>
+		<filename>helper.php</filename>
+		<folder>tmpl</folder>
+
+	</files>
+	<params>
+				
+		<param name="show_thermo" type="list" default="0" label="Show Thermometer?" description="Select what shall be shown">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="show_percent" type="list" default="0" label="Show Text of percent goal?" description="Select what shall be shown">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>				
+		<param name="width" type="text" default="250" label="Width" description="Enter the desired width, the height is automatically determined." />
+
+		<param name="thermo_max" type="text" default="0" label="Thermometer Max Value" description="The integer value of the top of the thermometer E.g. 10000" />
+		<param name="scale_markers" type="text" default="0" label="Thermometer Scale Markers" description="Comma-seperated list of currency values to display on the thermometer's scale.  E.g. 1000|5000|10000" />
+		<param name="fundraising_goal" type="text" default="0" label="Fundraising Goal" description="Show your fundraising goal and progress" />
+		<param name="recent_donations" type="text" default="0" label="Show X Recent Donations" description="Show the dollar amounts of the last X donations" />
+		<param name="configuration_id" type="text" default="0" label="Configuration Id(s)" description="The ID(s) to include" />
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+		<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
+	</params>
+</install>

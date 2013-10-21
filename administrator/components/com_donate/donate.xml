@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="component" version="1.5.0">
+<name>donate</name>
+<creationDate>02/02/2009</creationDate>
+<author>Michael Fatica</author>
+<copyright>Copyright 2009 Michael Fatica,Fatica Consulting L.L.C. All Rights Reserved</copyright>
+<authorEmail>mike@fatica.net</authorEmail>
+<authorUrl>http://www.fatica.net</authorUrl>
+<version>$Revision: 285 $</version>
+<license>GPL</license>
+<description><![CDATA[ 
+Donations Component - Copyright 2009 Fatica Consulting L.L.C. All Rights Reserved 
+<h2>You must now configure the component before you can start accepting donations on-line.</h2> 
+<p>For support, please visit <a href="http://www.fatica.net/forum">www.fatica.net/forum</a></p>
+]]></description>
+<installfile>install.com_donate.php</installfile>
+<files>
+	<filename>authorizenet.php</filename>
+	<filename>config.class.php</filename>
+	<filename>cvv.html</filename>
+	<filename>donate.class.php</filename>
+	<filename>donate.css</filename>
+	<filename>donate.html.php</filename>
+	<filename>donate.js</filename>
+	<filename>echeck.jpg</filename>
+	<filename>fxjoomla.php</filename>
+	<filename>fxmambo.php</filename>
+	<filename>donate.php</filename>
+	<filename>i8n/en-GB.php</filename>
+	<filename>i8n/es-ES.php</filename>
+	<filename>processors/dummy.php</filename>
+	<filename>processors/bibit.php</filename>
+	<filename>processors/authorizenet.php</filename>
+	<filename>processors/payflow_pro.php</filename>
+	<filename>processors/paypal_pro.php</filename>
+	<filename>processors/paypal_payflow_link.php</filename>
+	<filename>processors/paypal_standard.php</filename>
+</files>
+<install>
+<queries>
+	<query><![CDATA[ 		
+		CREATE TABLE IF NOT EXISTS `#__donate` (
+		  `id` int(11) NOT NULL auto_increment,
+		  `active` int(11) NOT NULL default '1',
+		  `options` text,
+		  PRIMARY KEY  (`id`)
+		);
+	]]></query>
+	
+	<query><![CDATA[ 		
+		CREATE TABLE IF NOT EXISTS `#__donate_number` (
+		  `id` int(11) NOT NULL auto_increment,
+		  PRIMARY KEY  (`id`)
+		);
+	]]></query>
+		
+	
+	<query><![CDATA[ 
+		INSERT INTO `#__donate` (`active`,`options`) VALUES (1, 'save_user_id=0,validate_user_account=1,force_https=0,select_joomfish_lang=,use_joomfish_lang=0,default_account_level=18,language_file=en-GB.php,block_user_account=1,show_user_account=0,create_user_account=0,admin_email=,sitename=My Site Name,processor=paypal_standard,gateway_mode=test,show_billing_address=1,show_email=1,show_phone=1,show_comments=0,show_organization=0,show_title=0,show_salutation=0,send_thankyou_email=0,send_admin_email=0,send_htmlemail=1,thank_you_body=Thank you for your donation!,thank_you_subject=Your Donation,thank_you_page=,thank_you_page_message=Thank you for your donation.,amounts=100.00|200.00|300.00,currency_descr=US,card_types=Visa|Mastercard,required_fields=firstname|lastname|card_type|credit_card|expiration_month|expiration_year|cvv|address1|city|_cd_state|postalcode|phone|email,auth_net_login=,auth_net_xaction=,wpp_user=,wpp_password=,wpp_signature=,payflow_user=,payflow_vendor=,payflow_partner=,payflow_password=,paypal_account=,show_country=1,show_credit=0,show_intro_text=1,intro_text=<h2>Donate Today</h2><p>Use the form below to make a donation.</p>,store_full_cc=0,');
+	]]></query>
+	<query><![CDATA[ 
+		CREATE TABLE IF NOT EXISTS `#__donations` (
+	  `id` int(11) NOT NULL auto_increment,
+	  `firstname` varchar(255) NOT NULL,
+	  `lastname` varchar(255) NOT NULL,
+	  `title` varchar(255) NOT NULL,
+	  `organization` varchar(255) NOT NULL,
+	  `credit_card` varchar(16) NOT NULL,
+	  `expiration` varchar(4) NOT NULL,
+	  `expiration_month` varchar(4) NOT NULL,
+	  `expiration_year` varchar(4) NOT NULL,	  
+	  `cvv` varchar(3) NOT NULL,
+	  `address1` varchar(255) NOT NULL,
+	  `address2` varchar(255) NOT NULL,
+	  `city` varchar(255) NOT NULL,
+	  `state` varchar(255) NOT NULL,
+	  `country` varchar(255) NOT NULL,
+	  `postalcode` varchar(10) NOT NULL,
+	  `email` varchar(255) NOT NULL,
+	  `phone` varchar(255) NOT NULL,
+	  `extension` varchar(255) NOT NULL,
+	  `comments` text NOT NULL,
+	  `amount` double NOT NULL,
+	  `xaction_result` varchar(255) NOT NULL,
+	  `xaction_id` varchar(255) default NULL,
+	  `timestamp` datetime default NULL,
+	  `card_type` varchar(255) default NULL,
+	  `country_currency` varchar(5) default NULL,
+	  `length` varchar(20) default NULL,
+	  `unit` varchar(20) default NULL,
+	  `duration` varchar(20) default NULL,
+	  `configuration_id` int(11) default NULL,
+	  `program` varchar(255) default NULL,
+	  `invoice` varchar(255) default NULL,
+	  `other` text NOT NULL,
+	  `user_id` int(11) default NULL,
+	  PRIMARY KEY  (`id`)
+	);
+	]]></query>
+	
+	<!-- 
+	
+	UPGRADE ALTER TABLE #__donations add configuration_id int(11);
+	
+	ALTER TABLE #__donations add  `program` varchar(255) default NULL;
+	ALTER TABLE #__donations add `other` text NOT NULL;
+
+	-->
+		
+	<query><![CDATA[ 
+	DROP TABLE IF EXISTS `#__donate_countries`;
+	]]></query>	
+	<query><![CDATA[ 
+		CREATE TABLE `#__donate_countries` (
+		  `id` int(11) NOT NULL auto_increment,
+		  `countries_name` varchar(64) NOT NULL,
+		  `countries_iso_code_2` char(2) NOT NULL,
+		  `countries_iso_code_3` char(3) NOT NULL,
+		  PRIMARY KEY  (`id`),
+		  KEY `IDX_COUNTRIES_NAME` (`countries_name`)
+		);
+	]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (1, 'Afghanistan', 'AF', 'AFG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (2, 'Albania', 'AL', 'ALB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (3, 'Algeria', 'DZ', 'DZA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (4, 'American Samoa', 'AS', 'ASM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (5, 'Andorra', 'AD', 'AND');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (6, 'Angola', 'AO', 'AGO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (7, 'Anguilla', 'AI', 'AIA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (8, 'Antarctica', 'AQ', 'ATA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (9, 'Antigua and Barbuda', 'AG', 'ATG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (10, 'Argentina', 'AR', 'ARG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (11, 'Armenia', 'AM', 'ARM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (12, 'Aruba', 'AW', 'ABW');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (13, 'Australia', 'AU', 'AUS');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (14, 'Austria', 'AT', 'AUT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (15, 'Azerbaijan', 'AZ', 'AZE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (16, 'Bahamas', 'BS', 'BHS');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (17, 'Bahrain', 'BH', 'BHR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (18, 'Bangladesh', 'BD', 'BGD');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (19, 'Barbados', 'BB', 'BRB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (20, 'Belarus', 'BY', 'BLR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (21, 'Belgium', 'BE', 'BEL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (22, 'Belize', 'BZ', 'BLZ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (23, 'Benin', 'BJ', 'BEN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (24, 'Bermuda', 'BM', 'BMU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (25, 'Bhutan', 'BT', 'BTN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (26, 'Bolivia', 'BO', 'BOL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (27, 'Bosnia and Herzegowina', 'BA', 'BIH');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (28, 'Botswana', 'BW', 'BWA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (29, 'Bouvet Island', 'BV', 'BVT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (30, 'Brazil', 'BR', 'BRA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (31, 'British Indian Ocean Territory', 'IO', 'IOT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (32, 'Brunei Darussalam', 'BN', 'BRN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (33, 'Bulgaria', 'BG', 'BGR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (34, 'Burkina Faso', 'BF', 'BFA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (35, 'Burundi', 'BI', 'BDI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (36, 'Cambodia', 'KH', 'KHM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (37, 'Cameroon', 'CM', 'CMR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (38, 'Canada', 'CA', 'CAN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (39, 'Cape Verde', 'CV', 'CPV');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (40, 'Cayman Islands', 'KY', 'CYM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (41, 'Central African Republic', 'CF', 'CAF');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (42, 'Chad', 'TD', 'TCD');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (43, 'Chile', 'CL', 'CHL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (44, 'China', 'CN', 'CHN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (45, 'Christmas Island', 'CX', 'CXR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (46, 'Cocos (Keeling) Islands', 'CC', 'CCK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (47, 'Colombia', 'CO', 'COL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (48, 'Comoros', 'KM', 'COM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (49, 'Congo', 'CG', 'COG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (50, 'Cook Islands', 'CK', 'COK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (51, 'Costa Rica', 'CR', 'CRI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (52, 'Cote D''Ivoire', 'CI', 'CIV');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (53, 'Croatia', 'HR', 'HRV');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (54, 'Cuba', 'CU', 'CUB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (55, 'Cyprus', 'CY', 'CYP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (56, 'Czech Republic', 'CZ', 'CZE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (57, 'Denmark', 'DK', 'DNK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (58, 'Djibouti', 'DJ', 'DJI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (59, 'Dominica', 'DM', 'DMA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (60, 'Dominican Republic', 'DO', 'DOM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (61, 'East Timor', 'TP', 'TMP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (62, 'Ecuador', 'EC', 'ECU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (63, 'Egypt', 'EG', 'EGY');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (64, 'El Salvador', 'SV', 'SLV');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (65, 'Equatorial Guinea', 'GQ', 'GNQ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (66, 'Eritrea', 'ER', 'ERI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (67, 'Estonia', 'EE', 'EST');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (68, 'Ethiopia', 'ET', 'ETH');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (69, 'Falkland Islands (Malvinas)', 'FK', 'FLK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (70, 'Faroe Islands', 'FO', 'FRO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (71, 'Fiji', 'FJ', 'FJI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (72, 'Finland', 'FI', 'FIN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (73, 'France', 'FR', 'FRA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (74, 'France, Metropolitan', 'FX', 'FXX');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (75, 'French Guiana', 'GF', 'GUF');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (76, 'French Polynesia', 'PF', 'PYF');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (77, 'French Southern Territories', 'TF', 'ATF');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (78, 'Gabon', 'GA', 'GAB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (79, 'Gambia', 'GM', 'GMB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (80, 'Georgia', 'GE', 'GEO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (81, 'Germany', 'DE', 'DEU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (82, 'Ghana', 'GH', 'GHA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (83, 'Gibraltar', 'GI', 'GIB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (84, 'Greece', 'GR', 'GRC');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (85, 'Greenland', 'GL', 'GRL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (86, 'Grenada', 'GD', 'GRD');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (87, 'Guadeloupe', 'GP', 'GLP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (88, 'Guam', 'GU', 'GUM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (89, 'Guatemala', 'GT', 'GTM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (90, 'Guinea', 'GN', 'GIN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (91, 'Guinea-bissau', 'GW', 'GNB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (92, 'Guyana', 'GY', 'GUY');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (93, 'Haiti', 'HT', 'HTI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (94, 'Heard and Mc Donald Islands', 'HM', 'HMD');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (95, 'Honduras', 'HN', 'HND');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (96, 'Hong Kong', 'HK', 'HKG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (97, 'Hungary', 'HU', 'HUN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (98, 'Iceland', 'IS', 'ISL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (99, 'India', 'IN', 'IND');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (100, 'Indonesia', 'ID', 'IDN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (101, 'Iran (Islamic Republic of)', 'IR', 'IRN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (102, 'Iraq', 'IQ', 'IRQ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (103, 'Ireland', 'IE', 'IRL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (104, 'Israel', 'IL', 'ISR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (105, 'Italy', 'IT', 'ITA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (106, 'Jamaica', 'JM', 'JAM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (107, 'Japan', 'JP', 'JPN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (108, 'Jordan', 'JO', 'JOR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (109, 'Kazakhstan', 'KZ', 'KAZ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (110, 'Kenya', 'KE', 'KEN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (111, 'Kiribati', 'KI', 'KIR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (112, 'Korea, Democratic People''s Republic of', 'KP', 'PRK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (113, 'Korea, Republic of', 'KR', 'KOR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (114, 'Kuwait', 'KW', 'KWT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (115, 'Kyrgyzstan', 'KG', 'KGZ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (116, 'Lao People''s Democratic Republic', 'LA', 'LAO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (117, 'Latvia', 'LV', 'LVA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (118, 'Lebanon', 'LB', 'LBN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (119, 'Lesotho', 'LS', 'LSO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (120, 'Liberia', 'LR', 'LBR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (121, 'Libyan Arab Jamahiriya', 'LY', 'LBY');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (122, 'Liechtenstein', 'LI', 'LIE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (123, 'Lithuania', 'LT', 'LTU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (124, 'Luxembourg', 'LU', 'LUX');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (125, 'Macau', 'MO', 'MAC');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (126, 'Macedonia, The Former Yugoslav Republic of', 'MK', 'MKD');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (127, 'Madagascar', 'MG', 'MDG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (128, 'Malawi', 'MW', 'MWI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (129, 'Malaysia', 'MY', 'MYS');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (130, 'Maldives', 'MV', 'MDV');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (131, 'Mali', 'ML', 'MLI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (132, 'Malta', 'MT', 'MLT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (133, 'Marshall Islands', 'MH', 'MHL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (134, 'Martinique', 'MQ', 'MTQ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (135, 'Mauritania', 'MR', 'MRT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (136, 'Mauritius', 'MU', 'MUS');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (137, 'Mayotte', 'YT', 'MYT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (138, 'Mexico', 'MX', 'MEX');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (139, 'Micronesia, Federated States of', 'FM', 'FSM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (140, 'Moldova, Republic of', 'MD', 'MDA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (141, 'Monaco', 'MC', 'MCO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (142, 'Mongolia', 'MN', 'MNG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (143, 'Montserrat', 'MS', 'MSR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (144, 'Morocco', 'MA', 'MAR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (145, 'Mozambique', 'MZ', 'MOZ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (146, 'Myanmar', 'MM', 'MMR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (147, 'Namibia', 'NA', 'NAM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (148, 'Nauru', 'NR', 'NRU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (149, 'Nepal', 'NP', 'NPL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (150, 'Netherlands', 'NL', 'NLD');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (151, 'Netherlands Antilles', 'AN', 'ANT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (152, 'New Caledonia', 'NC', 'NCL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (153, 'New Zealand', 'NZ', 'NZL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (154, 'Nicaragua', 'NI', 'NIC');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (155, 'Niger', 'NE', 'NER');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (156, 'Nigeria', 'NG', 'NGA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (157, 'Niue', 'NU', 'NIU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (158, 'Norfolk Island', 'NF', 'NFK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (159, 'Northern Mariana Islands', 'MP', 'MNP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (160, 'Norway', 'NO', 'NOR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (161, 'Oman', 'OM', 'OMN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (162, 'Pakistan', 'PK', 'PAK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (163, 'Palau', 'PW', 'PLW');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (164, 'Panama', 'PA', 'PAN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (165, 'Papua New Guinea', 'PG', 'PNG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (166, 'Paraguay', 'PY', 'PRY');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (167, 'Peru', 'PE', 'PER');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (168, 'Philippines', 'PH', 'PHL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (169, 'Pitcairn', 'PN', 'PCN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (170, 'Poland', 'PL', 'POL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (171, 'Portugal', 'PT', 'PRT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (172, 'Puerto Rico', 'PR', 'PRI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (173, 'Qatar', 'QA', 'QAT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (174, 'Reunion', 'RE', 'REU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (175, 'Romania', 'RO', 'ROM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (176, 'Russian Federation', 'RU', 'RUS');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (177, 'Rwanda', 'RW', 'RWA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (178, 'Saint Kitts and Nevis', 'KN', 'KNA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (179, 'Saint Lucia', 'LC', 'LCA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (180, 'Saint Vincent and the Grenadines', 'VC', 'VCT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (181, 'Samoa', 'WS', 'WSM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (182, 'San Marino', 'SM', 'SMR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (183, 'Sao Tome and Principe', 'ST', 'STP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (184, 'Saudi Arabia', 'SA', 'SAU');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (185, 'Senegal', 'SN', 'SEN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (186, 'Seychelles', 'SC', 'SYC');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (187, 'Sierra Leone', 'SL', 'SLE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (188, 'Singapore', 'SG', 'SGP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (189, 'Slovakia (Slovak Republic)', 'SK', 'SVK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (190, 'Slovenia', 'SI', 'SVN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (191, 'Solomon Islands', 'SB', 'SLB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (192, 'Somalia', 'SO', 'SOM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (193, 'South Africa', 'ZA', 'ZAF');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (194, 'South Georgia and the South Sandwich Islands', 'GS', 'SGS');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (195, 'Spain', 'ES', 'ESP');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (196, 'Sri Lanka', 'LK', 'LKA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (197, 'St. Helena', 'SH', 'SHN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (198, 'St. Pierre and Miquelon', 'PM', 'SPM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (199, 'Sudan', 'SD', 'SDN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (200, 'Suriname', 'SR', 'SUR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (201, 'Svalbard and Jan Mayen Islands', 'SJ', 'SJM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (202, 'Swaziland', 'SZ', 'SWZ');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (203, 'Sweden', 'SE', 'SWE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (204, 'Switzerland', 'CH', 'CHE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (205, 'Syrian Arab Republic', 'SY', 'SYR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (206, 'Taiwan', 'TW', 'TWN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (207, 'Tajikistan', 'TJ', 'TJK');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (208, 'Tanzania, United Republic of', 'TZ', 'TZA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (209, 'Thailand', 'TH', 'THA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (210, 'Togo', 'TG', 'TGO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (211, 'Tokelau', 'TK', 'TKL');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (212, 'Tonga', 'TO', 'TON');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (213, 'Trinidad and Tobago', 'TT', 'TTO');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (214, 'Tunisia', 'TN', 'TUN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (215, 'Turkey', 'TR', 'TUR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (216, 'Turkmenistan', 'TM', 'TKM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (217, 'Turks and Caicos Islands', 'TC', 'TCA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (218, 'Tuvalu', 'TV', 'TUV');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (219, 'Uganda', 'UG', 'UGA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (220, 'Ukraine', 'UA', 'UKR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (221, 'United Arab Emirates', 'AE', 'ARE');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (222, 'United Kingdom', 'GB', 'GBR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (223, 'United States', 'US', 'USA');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (224, 'United States Minor Outlying Islands', 'UM', 'UMI');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (225, 'Uruguay', 'UY', 'URY');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (226, 'Uzbekistan', 'UZ', 'UZB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (227, 'Vanuatu', 'VU', 'VUT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (228, 'Vatican City State (Holy See)', 'VA', 'VAT');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (229, 'Venezuela', 'VE', 'VEN');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (230, 'Viet Nam', 'VN', 'VNM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (231, 'Virgin Islands (British)', 'VG', 'VGB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (232, 'Virgin Islands (U.S.)', 'VI', 'VIR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (233, 'Wallis and Futuna Islands', 'WF', 'WLF');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (234, 'Western Sahara', 'EH', 'ESH');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (235, 'Yemen', 'YE', 'YEM');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (236, 'Yugoslavia', 'YU', 'YUG');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (237, 'Zaire', 'ZR', 'ZAR');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (238, 'Zambia', 'ZM', 'ZMB');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_countries` VALUES (239, 'Zimbabwe', 'ZW', 'ZWE');]]></query>	
+	<query><![CDATA[ 
+	DROP TABLE IF EXISTS `#__donate_states`;
+	]]></query>		
+	<query><![CDATA[ 
+		CREATE TABLE `#__donate_states` (
+		  `id` int(11) NOT NULL auto_increment,
+		  `country_id` int(11) NOT NULL,
+		  `state_code` varchar(32) NOT NULL default '',
+		  `state_name` varchar(32) NOT NULL default '',
+		  PRIMARY KEY  (`id`)
+		);
+	]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (1, 223, 'AL', 'Alabama');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (2, 223, 'AK', 'Alaska');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (3, 223, 'AS', 'American Samoa');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (4, 223, 'AZ', 'Arizona');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (5, 223, 'AR', 'Arkansas');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (6, 223, 'AF', 'Armed Forces Africa');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (7, 223, 'AA', 'Armed Forces Americas');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (8, 223, 'AC', 'Armed Forces Canada');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (9, 223, 'AE', 'Armed Forces Europe');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (10, 223, 'AM', 'Armed Forces Middle East');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (11, 223, 'AP', 'Armed Forces Pacific');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (12, 223, 'CA', 'California');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (13, 223, 'CO', 'Colorado');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (14, 223, 'CT', 'Connecticut');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (15, 223, 'DE', 'Delaware');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (16, 223, 'DC', 'District of Columbia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (17, 223, 'FM', 'Federated States Of Micronesia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (18, 223, 'FL', 'Florida');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (19, 223, 'GA', 'Georgia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (20, 223, 'GU', 'Guam');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (21, 223, 'HI', 'Hawaii');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (22, 223, 'ID', 'Idaho');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (23, 223, 'IL', 'Illinois');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (24, 223, 'IN', 'Indiana');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (25, 223, 'IA', 'Iowa');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (26, 223, 'KS', 'Kansas');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (27, 223, 'KY', 'Kentucky');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (28, 223, 'LA', 'Louisiana');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (29, 223, 'ME', 'Maine');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (30, 223, 'MH', 'Marshall Islands');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (31, 223, 'MD', 'Maryland');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (32, 223, 'MA', 'Massachusetts');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (33, 223, 'MI', 'Michigan');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (34, 223, 'MN', 'Minnesota');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (35, 223, 'MS', 'Mississippi');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (36, 223, 'MO', 'Missouri');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (37, 223, 'MT', 'Montana');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (38, 223, 'NE', 'Nebraska');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (39, 223, 'NV', 'Nevada');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (40, 223, 'NH', 'New Hampshire');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (41, 223, 'NJ', 'New Jersey');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (42, 223, 'NM', 'New Mexico');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (43, 223, 'NY', 'New York');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (44, 223, 'NC', 'North Carolina');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (45, 223, 'ND', 'North Dakota');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (46, 223, 'MP', 'Northern Mariana Islands');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (47, 223, 'OH', 'Ohio');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (48, 223, 'OK', 'Oklahoma');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (49, 223, 'OR', 'Oregon');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (50, 223, 'PW', 'Palau');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (51, 223, 'PA', 'Pennsylvania');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (52, 223, 'PR', 'Puerto Rico');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (53, 223, 'RI', 'Rhode Island');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (54, 223, 'SC', 'South Carolina');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (55, 223, 'SD', 'South Dakota');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (56, 223, 'TN', 'Tennessee');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (57, 223, 'TX', 'Texas');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (58, 223, 'UT', 'Utah');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (59, 223, 'VT', 'Vermont');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (60, 223, 'VI', 'Virgin Islands');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (61, 223, 'VA', 'Virginia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (62, 223, 'WA', 'Washington');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (63, 223, 'WV', 'West Virginia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (64, 223, 'WI', 'Wisconsin');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (65, 223, 'WY', 'Wyoming');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (66, 38, 'AB', 'Alberta');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (67, 38, 'BC', 'British Columbia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (68, 38, 'MB', 'Manitoba');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (69, 38, 'NF', 'Newfoundland');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (70, 38, 'NB', 'New Brunswick');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (71, 38, 'NS', 'Nova Scotia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (72, 38, 'NT', 'Northwest Territories');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (73, 38, 'NU', 'Nunavut');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (74, 38, 'ON', 'Ontario');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (75, 38, 'PE', 'Prince Edward Island');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (76, 38, 'QC', 'Quebec');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (77, 38, 'SK', 'Saskatchewan');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (78, 38, 'YT', 'Yukon Territory');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (79, 81, 'NDS', 'Niedersachsen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (80, 81, 'BAW', 'Baden-Wurttemberg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (81, 81, 'BAY', 'Bayern');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (82, 81, 'BER', 'Berlin');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (83, 81, 'BRG', 'Brandenburg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (84, 81, 'BRE', 'Bremen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (85, 81, 'HAM', 'Hamburg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (86, 81, 'HES', 'Hessen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (87, 81, 'MEC', 'Mecklenburg-Vorpommern');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (88, 81, 'NRW', 'Nordrhein-Westfalen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (89, 81, 'RHE', 'Rheinland-Pfalz');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (90, 81, 'SAR', 'Saarland');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (91, 81, 'SAS', 'Sachsen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (92, 81, 'SAC', 'Sachsen-Anhalt');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (93, 81, 'SCN', 'Schleswig-Holstein');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (94, 81, 'THE', 'Thuringen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (95, 14, 'WI', 'Wien');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (96, 14, 'NO', 'Niederosterreich');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (97, 14, 'OO', 'Oberosterreich');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (98, 14, 'SB', 'Salzburg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (99, 14, 'KN', 'Karnten');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (100, 14, 'ST', 'Steiermark');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (101, 14, 'TI', 'Tirol');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (102, 14, 'BL', 'Burgenland');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (103, 14, 'VB', 'Voralberg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (104, 204, 'AG', 'Aargau');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (105, 204, 'AI', 'Appenzell Innerrhoden');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (106, 204, 'AR', 'Appenzell Ausserrhoden');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (107, 204, 'BE', 'Bern');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (108, 204, 'BL', 'Basel-Landschaft');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (109, 204, 'BS', 'Basel-Stadt');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (110, 204, 'FR', 'Freiburg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (111, 204, 'GE', 'Genf');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (112, 204, 'GL', 'Glarus');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (113, 204, 'JU', 'Graubunden');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (114, 204, 'JU', 'Jura');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (115, 204, 'LU', 'Luzern');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (116, 204, 'NE', 'Neuenburg');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (117, 204, 'NW', 'Nidwalden');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (118, 204, 'OW', 'Obwalden');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (119, 204, 'SG', 'St. Gallen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (120, 204, 'SH', 'Schaffhausen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (121, 204, 'SO', 'Solothurn');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (122, 204, 'SZ', 'Schwyz');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (123, 204, 'TG', 'Thurgau');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (124, 204, 'TI', 'Tessin');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (125, 204, 'UR', 'Uri');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (126, 204, 'VD', 'Waadt');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (127, 204, 'VS', 'Wallis');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (128, 204, 'ZG', 'Zug');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (129, 204, 'ZH', 'Zurich');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (130, 195, 'A Coruna', 'A Coruna');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (131, 195, 'Alava', 'Alava');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (132, 195, 'Albacete', 'Albacete');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (133, 195, 'Alicante', 'Alicante');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (134, 195, 'Almeria', 'Almeria');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (135, 195, 'Asturias', 'Asturias');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (136, 195, 'Avila', 'Avila');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (137, 195, 'Badajoz', 'Badajoz');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (138, 195, 'Baleares', 'Baleares');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (139, 195, 'Barcelona', 'Barcelona');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (140, 195, 'Burgos', 'Burgos');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (141, 195, 'Caceres', 'Caceres');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (142, 195, 'Cadiz', 'Cadiz');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (143, 195, 'Cantabria', 'Cantabria');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (144, 195, 'Castellon', 'Castellon');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (145, 195, 'Ceuta', 'Ceuta');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (146, 195, 'Ciudad Real', 'Ciudad Real');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (147, 195, 'Cordoba', 'Cordoba');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (148, 195, 'Cuenca', 'Cuenca');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (149, 195, 'Girona', 'Girona');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (150, 195, 'Granada', 'Granada');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (151, 195, 'Guadalajara', 'Guadalajara');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (152, 195, 'Guipuzcoa', 'Guipuzcoa');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (153, 195, 'Huelva', 'Huelva');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (154, 195, 'Huesca', 'Huesca');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (155, 195, 'Jaen', 'Jaen');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (156, 195, 'La Rioja', 'La Rioja');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (157, 195, 'Las Palmas', 'Las Palmas');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (158, 195, 'Leon', 'Leon');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (159, 195, 'Lleida', 'Lleida');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (160, 195, 'Lugo', 'Lugo');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (161, 195, 'Madrid', 'Madrid');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (162, 195, 'Malaga', 'Malaga');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (163, 195, 'Melilla', 'Melilla');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (164, 195, 'Murcia', 'Murcia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (165, 195, 'Navarra', 'Navarra');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (166, 195, 'Ourense', 'Ourense');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (167, 195, 'Palencia', 'Palencia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (168, 195, 'Pontevedra', 'Pontevedra');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (169, 195, 'Salamanca', 'Salamanca');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (170, 195, 'Santa Cruz de Tenerife', 'Santa Cruz de Tenerife');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (171, 195, 'Segovia', 'Segovia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (172, 195, 'Sevilla', 'Sevilla');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (173, 195, 'Soria', 'Soria');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (174, 195, 'Tarragona', 'Tarragona');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (175, 195, 'Teruel', 'Teruel');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (176, 195, 'Toledo', 'Toledo');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (177, 195, 'Valencia', 'Valencia');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (178, 195, 'Valladolid', 'Valladolid');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (179, 195, 'Vizcaya', 'Vizcaya');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (180, 195, 'Zamora', 'Zamora');]]></query>
+	<query><![CDATA[ INSERT INTO `#__donate_states` VALUES (181, 195, 'Zaragoza', 'Zaragoza');]]></query>
+</queries>
+</install>
+<administration>
+ <menu img="js/ThemeOffice/component.png" task="show">Donations</menu>
+      <submenu>
+        <menu img="js/ThemeOffice/component.png" task="show">Show Donations</menu>
+        <menu img="js/ThemeOffice/component.png" task="configure">Configure</menu>
+      </submenu>
+	<files>
+		<filename>admin.donate.php</filename>
+		<filename>admin.donate.html.php</filename>
+		<filename>config.xml</filename>
+	</files>
+</administration>
+</install> 
